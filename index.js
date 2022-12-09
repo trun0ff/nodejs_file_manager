@@ -5,7 +5,7 @@ import {sayHi, sayBye, sayCurrFolder} from "./src/helpers/say.js";
 import {homedir} from "os";
 
 const usernameRaw = getArgValue('username');
-const username = !usernameRaw.length ? 'Guest' : usernameRaw.charAt(0).toUpperCase() + usernameRaw.slice(1);
+const username = (!usernameRaw || !usernameRaw.length) ? 'Guest' : usernameRaw.charAt(0).toUpperCase() + usernameRaw.slice(1);
 const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout

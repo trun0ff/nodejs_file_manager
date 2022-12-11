@@ -87,7 +87,7 @@ const actionCat = (params) => {
     if(!checkFilePath(getFirstPathArg(params))) {
         throw new InvalidArgumentError('Invalid input. File is not exist in ' + filePath);
     }
-    console.log('======= Contents of ' + filePath + ' =======');
+
     readFileByStream(filePath);
 };
 
@@ -109,7 +109,7 @@ const actionRename = (params) => {
 
 const actionCp = (params) => {
     if(!checkFilePath(getFirstPathArg(params)) || !checkDirPath(getSecondPathArg(params))) {
-        throw new InvalidArgumentError('Invalid input. first should be existing file and second is folder.');
+        throw new InvalidArgumentError('Invalid input. First parameter should be existing file and second is folder.');
     }
 
     copyFileByStream(
@@ -121,7 +121,7 @@ const actionCp = (params) => {
 const actionMv = (params) => {
     let filePath = prepareInputPath(getFirstPathArg(params));
     if(!checkFilePath(getFirstPathArg(params)) || !checkDirPath(getSecondPathArg(params))) {
-        throw new InvalidArgumentError('Invalid input. first should be existing file and second is folder.');
+        throw new InvalidArgumentError('Invalid input. First parameter should be existing file and second is folder.');
     }
 
     moveFileByStream(
@@ -173,8 +173,7 @@ const actionHash = (params) => {
 
 const actionCompress = async (params) => {
     if(!checkFilePath(getFirstPathArg(params)) || !checkDirPath(getSecondPathArg(params))) {
-        console.log('Check that first argument is file and second is directory that exists');
-        return;
+        throw new InvalidArgumentError('Check that first argument is file and second is directory that exists');
     }
 
     await compressBrotli(prepareInputPath(getFirstPathArg(params)), prepareInputPath(getSecondPathArg(params)));
@@ -182,7 +181,7 @@ const actionCompress = async (params) => {
 
 const actionDecompress = async (params) => {
     if(!checkFilePath(getFirstPathArg(params)) || !checkDirPath(getSecondPathArg(params))) {
-        throw new Error('Invalid input. Check that first argument is file and second is directory that exists');
+        throw new InvalidArgumentError('Check that first argument is file and second is directory that exists');
     }
 
     await decompressBrotli(prepareInputPath(getFirstPathArg(params)), prepareInputPath(getSecondPathArg(params)));

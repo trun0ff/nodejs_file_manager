@@ -9,18 +9,26 @@ const listContents = async (listFolder) => {
         if(err) throw new InvalidArgumentError('Operation failed');
     });
 
-    fs.readdir(listFolder, (err, files) => {
-        if(err) throw new InvalidArgumentError('Operation failed: ' + err.message);
-        if(files.length === 0) {
-            console.log('Directory is empty');
-        } else {
-            files.forEach((file) => {
-                console.log(file);
-            });
-        }
-        sayCurrFolder();
-    });
+    const files = await getDirectoryContents(listFolder)
+
+    if(files.length === 0) {
+        console.log('Directory is empty');
+    } else {
+        console.log(files)
+        console.table(files, ["Name", "Type"]);
+    }
+    sayCurrFolder();
+
 };
+
+const getDirectoryContents = async path => (await fs.promises.readdir(path, { withFileTypes: true }))
+    .sort((itemA,itemB) => {return itemA.isDirectory() && !itemB.isDirectory() ? -1 : 1})
+    .map(item => new FolderItem(item.name, item.isDirectory()))
+
+function FolderItem(name, isDir) {
+    this.Name = name;
+    this.Type = isDir ? 'directory' : 'file';
+}
 
 const readFile = (filePath) => {
     const readableStream = fs.createReadStream(filePath, 'utf-8');
@@ -66,43 +74,38 @@ const calculateHash = (inputPath) => {
 };
 
 const readFileByStream = (filePath) => {
-    const fileReadStream = fs.createReadStream(filePath, 'utf8');
 
+    const fileReadStream = fs.createReadStream(filePath, 'utf8');
     fileReadStream.on('error', function (error) {
         throw new Error(`Operation failed: ${error.message}`);
     });
 
+    console.log('======= START Contents of ' + filePath + ' =======');
     fileReadStream.on('data', (chunk) => {
         console.log(chunk);
     });
 
     fileReadStream.on('end', () => {
+        console.log('======= END Contents of ' + filePath + ' =======');
         sayCurrFolder();
     });
 }
 const copyFileByStream = (filePathFrom, destinationFolderPath) => {
-    const filePathTo = path.join(destinationFolderPath, path.basename(filePathFrom))
-    const readableStream = fs.createReadStream(filePathFrom, 'utf8');
-    const writableStream = fs.createWriteStream(filePathTo);
-
-    readableStream.on('data', (chunk) => {
-        writableStream.write(chunk);
-    });
+    const filePathTo = path.join(destinationFolderPath, path.basename(filePathFrom)),
+        readableStream = fs.createReadStream(filePathFrom, {encoding: 'utf8'}),
+        writableStream = fs.createWriteStream(filePathTo)
 
     readableStream.on('end', () => {
         sayCurrFolder();
     });
-    writableStream.end();
+
+    readableStream.pipe(writableStream)
 }
 
 const moveFileByStream = (filePathFrom, destinationFolderPath) => {
     const filePathTo = path.join(destinationFolderPath, path.basename(filePathFrom))
     const readableStream = fs.createReadStream(filePathFrom, 'utf8');
     const writableStream = fs.createWriteStream(filePathTo);
-
-    readableStream.on('data', (chunk) => {
-        writableStream.write(chunk);
-    });
 
     readableStream.on('end', () => {
         fs.unlink(filePathFrom, (err) => {
@@ -113,7 +116,8 @@ const moveFileByStream = (filePathFrom, destinationFolderPath) => {
         });
 
     });
-    writableStream.end();
+
+    readableStream.pipe(writableStream)
 }
 
 const createFile = async (filePath) => {

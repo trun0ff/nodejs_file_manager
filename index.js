@@ -27,6 +27,11 @@ rl.on('line', (line) => {
         .slice(inputLine.indexOf(' '), inputLine.length)
         .trim().match(/(?:[^\s"]+|"[^"]*")+/g);
 
+    if(action === '.exit') {
+        rl.close();
+        return;
+    }
+
     __resolveAction(action, params).then(() => {
         if(!actionsSayingFolderInside.includes(action)) {
             sayCurrFolder();

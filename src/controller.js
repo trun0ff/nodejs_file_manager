@@ -1,12 +1,17 @@
 import InvalidActionError from "./Errors/InvalidActionError.js";
 import path from "path";
 import {
-    calculateHash,
     checkDirPath,
-    checkFilePath, copyFileByStream, createFile, fileRemove, fileRename,
-    listContents, moveFileByStream,
+    checkFilePath,
     prepareInputPath,
-    readFileByStream
+    calculateHash,
+    createFile,
+    fileRemove,
+    fileRename,
+    listContents,
+    readFileByStream,
+    copyFileByStream,
+    moveFileByStream,
 } from "./helpers/files.js";
 import {getFirstKey, getFirstPathArg, getSecondPathArg} from "./helpers/args.js";
 import InvalidArgumentError from "./Errors/InvalidArgumentError.js";
@@ -138,8 +143,6 @@ const actionRemove = (params) => {
 
     fileRemove(filePath);
 };
-
-
 
 const actionOs = (params) => {
     let key = getFirstKey(params);

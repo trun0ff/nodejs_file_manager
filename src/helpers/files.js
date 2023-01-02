@@ -66,11 +66,18 @@ const prepareInputPath = (inputPath) => {
 }
 
 const calculateHash = (inputPath) => {
-    const fileBuffer = fs.readFileSync(inputPath);
-    const hashSum = crypto.createHash('sha256');
-    hashSum.update(fileBuffer);
-
-    return hashSum.digest('hex');
+    fs.promises.readFile(inputPath, 'utf-8')
+    .then((res) => {
+        const hashSum = crypto.createHash('sha256')
+        hashSum.update(res)
+        return hashSum.digest('hex')
+    })
+    .then((res) => {
+        console.log(res)
+    })
+    .catch((err) => {
+        console.error(err.message)
+    })
 };
 
 const readFileByStream = (filePath) => {
